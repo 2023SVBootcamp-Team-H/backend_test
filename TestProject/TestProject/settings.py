@@ -42,9 +42,11 @@ INSTALLED_APPS = [
     'worry',
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # CORS
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -53,6 +55,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_WHITELIST=("http://*","https://*")
+CORS_ALLOW_CREDENTIALS=True
 
 ROOT_URLCONF = 'TestProject.urls'
 
