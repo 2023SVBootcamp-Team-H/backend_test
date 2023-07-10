@@ -5,10 +5,12 @@ from .models import Personality
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+
 @api_view(['GET'])
 def personalities(request):
-    personalities = Personality.objects.values() #쿼리셋(QuerySet)을 딕셔너리 형태로 반환
+    personalities = Personality.objects.values()  # 쿼리셋(QuerySet)을 딕셔너리 형태로 반환
     return Response(personalities)
+
 
 score_request_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
@@ -50,3 +52,13 @@ def personalities_score(request: Request):
         return Response({"message": "해당하는 인격 이름이 없습니다."})
 
     return Response({"message": f"{personality_name}인격의 인기도가 {score}만큼 올라갔습니다."})
+
+
+@api_view(['POST'])
+def init_personality(request: Request):
+    res = {"message": "success"}
+    for i in range(5):
+        Personality.objects.create(
+            name=str(i), total=i, frequency=i, popularity=i)
+
+    return Response({"message": "Personality objects created successfully"})
