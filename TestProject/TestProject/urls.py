@@ -35,6 +35,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('answer/', include('answer.urls')),
     path('worry/', include('worry.urls')),
     path('personality/', include('personality.urls')),
     path('api/swagger<str:format>',
