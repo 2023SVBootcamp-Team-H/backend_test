@@ -1,6 +1,8 @@
 from django.db import models
 from TestProject.basemodel import BaseModel
-# Create your models here.
+
+# BaseModel -> Created_at, Modified_at, Deleted_at
+
 class Worry(BaseModel): # Worry 모델
     # TODO: 유저 모델을 연결해야함(FK)
     # TODO: 카테고리 모델을 연결해야함(FK)
