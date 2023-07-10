@@ -1,10 +1,11 @@
-from django.urls import path, include
-from django.contrib import admin
-from rest_framework import routers
-from .views import get_worry
-
-router = routers.DefaultRouter()
+from django.urls import path
+from .views import *
 
 urlpatterns = [
-    path('', get_worry),
+    path('', get_one_worry),
+    path('all', get_all_worry),
+    path('post', post_worry),
+    path('update', update_worry),
+    path('delete', delete_worry),
+
 ]
