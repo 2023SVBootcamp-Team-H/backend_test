@@ -1,4 +1,4 @@
-from django.urls import path,include
+from django.urls import path, include
 from django.contrib import admin
 from rest_framework import routers
 
@@ -12,6 +12,6 @@ router.register('answer', AnswerViewSet)
 app_name = "worry app"
 
 urlpatterns = [
-    path('admin/', admin.site.urls,name="admin"),
+    path('admin/', admin.site.urls, name="admin"),
     path('', include(router.urls)),
 ]
