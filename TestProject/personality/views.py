@@ -8,7 +8,7 @@ def personalities(request):
     content = [
         'id': personality.id,
         'name': personality
-        ]
+    ]
     return Response()
 
 @api_view(['POST'])

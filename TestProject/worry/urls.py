@@ -6,5 +6,5 @@ from .views import get_worry
 router = routers.DefaultRouter()
 
 urlpatterns = [
-    path('<int:worry_id>', get_worry),
+    path('', get_worry),
 ]

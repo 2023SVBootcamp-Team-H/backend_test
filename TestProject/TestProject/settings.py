@@ -40,13 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'worry',
+    'user',
+    'personality',
     'rest_framework',
     'drf_yasg',
     'corsheaders',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware', # CORS
+    'corsheaders.middleware.CorsMiddleware',  # CORS
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -56,8 +58,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST=("http://*","https://*")
-CORS_ALLOW_CREDENTIALS=True
+CORS_ORIGIN_WHITELIST = ("http://*", "https://*")
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'TestProject.urls'
 
@@ -88,8 +90,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-    ## MySQL
-    #'mysql':{
+    # MySQL
+    # 'mysql':{
     #    'ENGINE': 'django.db.backends.mysql',
     #    'NAME': 'test',
     #    'USER': 'root',
@@ -99,7 +101,7 @@ DATABASES = {
     #    'OPTIONS': {
     #        'charset': 'utf8mb4
     #    }
-    #}
+    # }
 }
 
 
