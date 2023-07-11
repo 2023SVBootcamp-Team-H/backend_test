@@ -142,7 +142,7 @@ def post_worry(request: Request):
 
     # personality info
     personality = request.data['personality']
-    if Personality(name=personality).first() is None and len(personality) != 0:
+    if Personality.objects.filter(name=personality).first() is None and len(personality) != 0:
         return Response(status=404, data=f"등록된 인물이 없습니다.")
 
     # user register
