@@ -1,4 +1,4 @@
-from TestProject.TestProject.basemodel import BaseModel
+from TestProject.basemodel import BaseModel
 from django.db import models
 
 

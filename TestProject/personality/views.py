@@ -46,7 +46,14 @@ def personalities_score(request: Request):
     # 인격 점수를 올리는 로직
     try:
         personality = Personality.objects.get(name=personality_name)
-        personality.total += score
+        # 인격의 populate가 증가
+        personality.popularity += score
+        if personality.frequency != 0:
+            # 빈번도가 0이 아니라면 total 증가
+            personality.total = personality.popularity / personality.frequency
+        else:
+            return Response({"message": "빈번도가 0입니다."})
+
         personality.save()
     except Personality.DoesNotExist:
         return Response({"message": "해당하는 인격 이름이 없습니다."})
