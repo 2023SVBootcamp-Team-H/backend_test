@@ -3,17 +3,25 @@ from rest_framework.response import Response
 from rest_framework.request import Request
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+import dotenv
+import os
 
 from .models import Worry
 from user.models import User
 from category.models import Category
 from personality.models import Personality
+from answer.models import Answer
+dotenv.load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 def gpt_answer(json_data):
     import openai  # for OpenAI API calls
-    openai.api_key = "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"
+    openai.api_key = SECRET_KEY
+    if json_data["sex"] == "male" or json_data["sex"]=="Male":
+        sex = "남자"
+    else:
+        sex = "여자"
     
-    sex = json_data["sex"]
     age = json_data["age"]
     job = json_data["job"]
     address = json_data["address"]
@@ -24,19 +32,32 @@ def gpt_answer(json_data):
     category = json_data["category"]
     personality = json_data["personality"]
     
-    worry_id = json_data["worry_id"]
+    worry = json_data["worry"]
     
     # send a ChatCompletion request to count to 100
+    messages = [
+        {'role': 'system', 'content': '안녕하세요. 저는 당신의 고민을 들어주는 챗봇입니다.'},
+        {'role':'user',"content":f"안녕하세요. 저는 {address}에 살고, {job}일을 하는 {age}살 {sex} {name}입니다."},
+        {'role': 'user', 'content': f"{category}에 대한 고민이 있습니다.어떤 고민이냐면요,"},
+        {'role': 'user', 'content': f"{content}"},
+        {'role': 'user', 'content': f"{personality}처럼 말해주세요."},
+    ]
+    
+    
+    # send a ChatCompletion request to GPT-3.5-turbo model
     response = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
-        messages=[
-            {'role': 'user', 'content': '오늘의 날씨를 말해줘'}
-        ],
-        temperature=0,
-        stream=True  # again, we set stream=True
+        messages=messages,
+        temperature=0.6,  # 조정 가능한 매개변수. 낮을수록 보수적, 높을수록 다양한 응답
+        stream = False, # 추후에 True로 변경 예정
+        max_tokens=50,  # 생성된 응답의 최대 토큰 수
+        n=1,  # 생성할 응답의 수
+        stop=None,  # 생성 중지 토큰 (optional)
+        log_level="info"  # 응답 로깅 레벨 (optional)
     )
     for chunk in response:
         print(chunk['choices'][0]['delta']["content"],end="",flush=True)
+    ans = Answer(worry = worry, content ="")
     return response
 
 worry_request_body_schema = openapi.Schema(
@@ -137,7 +158,7 @@ def post_worry(request:Request):
         "content":content,
         "category":category,
         "personality":personality,
-        "worry_id":worry.id,
+        "worry":worry,
     }
     return gpt_answer(json_data)
 
