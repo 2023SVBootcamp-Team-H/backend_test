@@ -12,7 +12,6 @@ class Worry(BaseModel):  # Worry 모델
     personality = models.ForeignKey(Personality, on_delete=models.CASCADE,null=True)
     
     content = models.CharField(max_length=300)  # 내용
-    
     # q.answer_set.all()로 접근 가능
     def __str__(self):
         return self.content
