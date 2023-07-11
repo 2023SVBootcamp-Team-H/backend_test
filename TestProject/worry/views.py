@@ -52,6 +52,7 @@ def gpt_answer(json_data):
         messages=messages,
         temperature=0.6,  # 조정 가능한 매개변수. 낮을수록 보수적, 높을수록 다양한 응답
         stream=False,  # 추후에 True로 변경 예정
+        max_tokens=500,  # 생성할 최대 토큰 수
         n=1,  # 생성할 응답의 수
         stop=None  # 생성 중지 토큰 (optional)
     )
@@ -131,12 +132,18 @@ def post_worry(request: Request):
         return Response(status=404, data=f"잘못된 입력입니다.")
     # worry info
     content = request.data['content']
+    if content == None or len(content) == 0:
+        return Response(status=404, data=f"잘못된 입력입니다.")
 
     # category info
     category = request.data['category']
+    if Category.objects.filter(name=category).first() is None and len(category) != 0:
+        return Response(status=404, data=f"등록된 카테고리가 없습니다.")
 
     # personality info
     personality = request.data['personality']
+    if Personality(name=personality).first() is None and len(personality) != 0:
+        return Response(status=404, data=f"등록된 인물이 없습니다.")
 
     # user register
     user_info = User(sex=sex, age=age, job=job,
