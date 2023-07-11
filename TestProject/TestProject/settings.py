@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'answer',
     'user',
     'personality',
+    'category',
     'rest_framework',
     'drf_yasg',
     'corsheaders',
