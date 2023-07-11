@@ -1,7 +1,8 @@
 from django.db import models
 from TestProject.basemodel import BaseModel
+from django_prometheus.models import ExportModelOperationsMixin
 
-class Personality(BaseModel):
+class Personality(ExportModelOperationsMixin('personality'),BaseModel):
     name = models.CharField(max_length=50, null=True)
     frequency = models.IntegerField()
     popularity = models.IntegerField()

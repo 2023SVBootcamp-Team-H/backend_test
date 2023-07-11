@@ -1,8 +1,8 @@
 from django.db import models
 from TestProject.basemodel import BaseModel
+from django_prometheus.models import ExportModelOperationsMixin
 
-
-class User(BaseModel):
+class User(ExportModelOperationsMixin('user'),BaseModel):
     age = models.SmallIntegerField()
     sex = models.CharField(max_length=6, choices=[
                            ('male', 'Male'), ('female', 'Female')])
