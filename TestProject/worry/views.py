@@ -9,6 +9,36 @@ from user.models import User
 from category.models import Category
 from personality.models import Personality
 
+def gpt_answer(json_data):
+    import openai  # for OpenAI API calls
+    openai.api_key = "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"
+    
+    sex = json_data["sex"]
+    age = json_data["age"]
+    job = json_data["job"]
+    address = json_data["address"]
+    name = json_data["nickname"]
+    
+    content = json_data["content"]
+    
+    category = json_data["category"]
+    personality = json_data["personality"]
+    
+    worry_id = json_data["worry_id"]
+    
+    # send a ChatCompletion request to count to 100
+    response = openai.ChatCompletion.create(
+        model='gpt-3.5-turbo',
+        messages=[
+            {'role': 'user', 'content': '오늘의 날씨를 말해줘'}
+        ],
+        temperature=0,
+        stream=True  # again, we set stream=True
+    )
+    for chunk in response:
+        print(chunk['choices'][0]['delta']["content"],end="",flush=True)
+    return response
+
 worry_request_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
@@ -68,15 +98,21 @@ def post_worry(request:Request):
     sex = request.data["sex"]
     age = request.data["age"]
     job = request.data["job"]
+    nickname = request.data["nickname"]
     address = request.data["address"]
+    if sex == None or age == None or job == None or address == None or nickname == None:
+        return Response(status=404, data=f"잘못된 입력입니다.")
+    # worry info
     content = request.data['content']
+    
     # category info
     category = request.data['category']
+    
     # personality info
     personality = request.data['personality']
     
     # user register
-    user_info = User(sex=sex,age=age,job=job,address=address)
+    user_info = User(sex=sex,age=age,job=job,nickname=nickname,address=address)
     user_info.save()
     
     try:
@@ -92,13 +128,26 @@ def post_worry(request:Request):
     
     worry = Worry.objects.create(user=user_info,category=category_info,personality=personality_info,content=content)
     
-    return Response(status=201, data=f"{worry.id}번째 고민이 생성되었습니다.")
+    json_data = {
+        "name":nickname,
+        "sex":sex,
+        "age":age,
+        "job":job,
+        "address":address,
+        "content":content,
+        "category":category,
+        "personality":personality,
+        "worry_id":worry.id,
+    }
+    return gpt_answer(json_data)
+
+
 
 # 고민 수정
 
 
 @api_view(['PUT'])
-def update_worry(request):
+def update_worry(request:Request):
     id = request.data['id']
     content = request.data['content']
     try:
@@ -108,6 +157,7 @@ def update_worry(request):
         return Response(status=200, data=f"{id}번째 고민이 수정되었습니다.")
     except Worry.DoesNotExist:
         return Response(status=404, data=f"{id}번째 고민이 없습니다.")
+
 
 # 고민 삭제
 
