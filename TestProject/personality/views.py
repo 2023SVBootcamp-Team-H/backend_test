@@ -61,11 +61,35 @@ def personalities_score(request: Request):
     return Response({"message": f"{personality_name}인격의 인기도가 {score}만큼 올라갔습니다."})
 
 
+init_request_body_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'personality_name': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+)
+init_response_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'message': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+)
+
+
+@swagger_auto_schema(method='post', request_body=init_request_body_schema, responses={200: init_response_schema})
 @api_view(['POST'])
-def init_personality(request: Request):
-    res = {"message": "success"}
-    for i in range(5):
-        Personality.objects.create(
-            name=str(i), total=i, frequency=i, popularity=i)
+def create_personality(request: Request):
+    try:
+        name = request.data.get("personality_name")
+    except Exception as e:
+        return Response({"message": "no attribute personality_name"})
+    Personality(name=name, frequency=0, popularity=0, total = 0).save()
 
     return Response({"message": "Personality objects created successfully"})
+
+
+@api_view(['DELETE'])
+def delete_personality(request: Request):
+    p_list = Personality.objects.all()
+    for i in p_list:
+        i.delete()
+    return Response({"message": "Personality objects all Delete"})
