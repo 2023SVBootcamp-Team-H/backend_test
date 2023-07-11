@@ -3,7 +3,6 @@ from TestProject.basemodel import BaseModel
 
 
 class User(BaseModel):
-    id = models.CharField(primary_key=True, max_length=50)
     age = models.SmallIntegerField()
     sex = models.CharField(max_length=6, choices=[
                            ('male', 'Male'), ('female', 'Female')])
