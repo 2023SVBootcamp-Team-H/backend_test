@@ -44,22 +44,22 @@ def gpt_answer(json_data):
         {'role': 'user', 'content': f"{category}에 대한 고민이 있습니다.어떤 고민이냐면요,"},
         {'role': 'user', 'content': f"{content}"},
         {'role': 'user', 'content': f"{personality}처럼 말해주세요."},
+        {'role': 'user', 'content': f"40글자 안으로 대답해줘."}
     ]
 
     # send a ChatCompletion request to GPT-3.5-turbo model
     response = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
         messages=messages,
-        temperature=0.6,  # 조정 가능한 매개변수. 낮을수록 보수적, 높을수록 다양한 응답
+        temperature=0.4,  # 조정 가능한 매개변수. 낮을수록 보수적, 높을수록 다양한 응답
         stream=False,  # 추후에 True로 변경 예정
-        max_tokens=500,  # 생성할 최대 토큰 수
+        max_tokens=450,  # 생성할 최대 토큰 수
         n=1,  # 생성할 응답의 수
         stop=None  # 생성 중지 토큰 (optional)
     )
-    res = []
-    # for chunk in response:
-    #     print(chunk['choices'][0]['delta']["content"], end="", flush=True)
-    #     res.append(chunk['choices'][0]['delta']["content"])
+    
+    responded_answer = Answer(worry=worry, content=response['choices'][0]["message"]["content"])
+    responded_answer.save()
     print(response['choices'][0]["message"]["content"])
     return response['choices'][0]["message"]["content"]
 
