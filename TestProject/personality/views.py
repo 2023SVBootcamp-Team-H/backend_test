@@ -59,7 +59,7 @@ def personalities(request: Request):
             name = request.data.get("personality_name")
         except Exception as e:
             return Response({"message": "no attribute personality_name"})
-        Personality(name=name, frequency=0, popularity=0, total=0).save()
+        Personality(name=name).save()
 
         return Response({"message": "Personality objects created successfully"})
     elif request.method == 'DELETE':
@@ -67,55 +67,3 @@ def personalities(request: Request):
         for i in p_list:
             i.delete()
         return Response({"message": "Personality objects all Delete"})
-
-
-@swagger_auto_schema(method='post', request_body=score_request_body_schema, responses={200: score_response_schema})
-@api_view(['POST'])
-def personalities_score(request: Request):
-    res = {"message": "success"}
-    body = request.data
-    # 만약 요청 값이 없다면 fail return
-    if "personality_name" not in body or "score" not in body:
-        res = {"message": "바디값을 확인하세요"}
-        return Response(res)
-
-    # 바디값 가져오기
-    personality_name = body.get("personality_name")
-    score = body.get("score")
-
-    # 인격 점수를 올리는 로직
-    try:
-        personality = Personality.objects.get(name=personality_name)
-        # 인격의 populate가 증가
-        personality.popularity += score
-        if personality.frequency != 0:
-            # 빈번도가 0이 아니라면 total 증가
-            personality.total = personality.popularity / personality.frequency
-        else:
-            return Response({"message": "빈번도가 0입니다."})
-
-        personality.save()
-    except Personality.DoesNotExist:
-        return Response({"message": "해당하는 인격 이름이 없습니다."})
-
-    return Response({"message": f"{personality_name}인격의 인기도가 {score}만큼 올라갔습니다."})
-
-
-@swagger_auto_schema(method='post', request_body=init_request_body_schema, responses={200: init_response_schema})
-@api_view(['POST'])
-def create_personality(request: Request):
-    try:
-        name = request.data.get("personality_name")
-    except Exception as e:
-        return Response({"message": "no attribute personality_name"})
-    Personality(name=name, frequency=0, popularity=0, total=0).save()
-
-    return Response({"message": "Personality objects created successfully"})
-
-
-@api_view(['DELETE'])
-def delete_personality(request: Request):
-    p_list = Personality.objects.all()
-    for i in p_list:
-        i.delete()
-    return Response({"message": "Personality objects all Delete"})
