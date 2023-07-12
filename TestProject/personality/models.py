@@ -4,9 +4,6 @@ from django_prometheus.models import ExportModelOperationsMixin
 
 class Personality(ExportModelOperationsMixin('personality'),BaseModel):
     name = models.CharField(max_length=50, null=True)
-    frequency = models.IntegerField()
-    popularity = models.IntegerField()
-    total = models.FloatField()
     image_url = models.CharField(max_length=500, null=True)
 
     def __str__(self):

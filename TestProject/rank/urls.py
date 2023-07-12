@@ -2,5 +2,6 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', answer_get_score),
+    path('', rank),
+    # path('gender', get_all_worry),
 ]
