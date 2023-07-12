@@ -4,7 +4,7 @@ from django_prometheus.models import ExportModelOperationsMixin
 
 class User(ExportModelOperationsMixin('user'),BaseModel):
     age = models.SmallIntegerField()
-    sex = models.CharField(max_length=6, choices=[
+    gender = models.CharField(max_length=6, choices=[
                            ('male', 'Male'), ('female', 'Female')])
     job = models.CharField(max_length=50)
     nickname = models.CharField(max_length=50)

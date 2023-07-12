@@ -40,22 +40,22 @@ def gpt_answer(json_data):
     # send a ChatCompletion request to count to 100
     messages = [
         {'role': 'system', 'content': '안녕하세요. 저는 당신의 고민을 들어주는 챗봇입니다.'},
-        {'role': 'user', "content": f"안녕하세요. 저는 {address}에 살고, {job}일을 하는 {age}살 {sex} {name}입니다."},
-        {'role': 'user', 'content': f"{category}에 대한 고민이 있습니다.어떤 고민이냐면요,"},
+        {'role': 'user', 'content': f"30글자 안으로 {personality}처럼 대답해."},
+        {'role': 'user', "content": f"안녕.{address}에 살고, {job}일을 하는 {age}살 {sex} {name}이야."},
+        {'role': 'user', 'content': f"{category}에 대한 고민"},
         {'role': 'user', 'content': f"{content}"},
-        {'role': 'user', 'content': f"{personality}처럼 말해주세요."},
-        {'role': 'user', 'content': f"40글자 안으로 대답해줘."}
-    ]
-
+        {'role': 'user', 'content': f"어떻게 해야할까?"}
+    ]   
+    print(messages)
     # send a ChatCompletion request to GPT-3.5-turbo model
     response = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
         messages=messages,
         temperature=0.4,  # 조정 가능한 매개변수. 낮을수록 보수적, 높을수록 다양한 응답
         stream=False,  # 추후에 True로 변경 예정
-        max_tokens=450,  # 생성할 최대 토큰 수
+        #max_tokens=200,  # 생성할 최대 토큰 수
         n=1,  # 생성할 응답의 수
-        stop=None  # 생성 중지 토큰 (optional)
+        # 생성 중지 토큰 (optional)
     )
     
     responded_answer = Answer(worry=worry, content=response['choices'][0]["message"]["content"])
