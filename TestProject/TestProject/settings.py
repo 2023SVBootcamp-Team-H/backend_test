@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'user',
     'personality',
     'category',
+    'rank',
     'rest_framework',
     'drf_yasg',
     'corsheaders',
