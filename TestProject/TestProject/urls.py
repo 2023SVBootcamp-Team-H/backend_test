@@ -39,6 +39,7 @@ urlpatterns = [
     path('worry/', include('worry.urls')),
     path('personality/', include('personality.urls')),
     path('category/', include('category.urls')),
+    path('rank/', include('rank.urls')),
     path('api/swagger<str:format>',
          schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('api/swagger/', schema_view.with_ui('swagger',
