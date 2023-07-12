@@ -98,17 +98,17 @@ DATABASES = {
         'NAME': BASE_DIR / 'db1.sqlite3',
     }
     # MySQL
-    # 'mysql':{
-    #    'ENGINE': 'django.db.backends.mysql',
-    #    'NAME': 'test',
-    #    'USER': 'root',
-    #    'PASSWORD': '1234',
-    #    'HOST': 'localhost',
-    #    'PORT': '3306
-    #    'OPTIONS': {
-    #        'charset': 'utf8mb4
-    #    }
-    # }
+    #'default':{
+    #   'ENGINE': 'django_prometheus.db.backends.mysql',
+    #   'NAME': 'test',
+    #   'USER': 'root',
+    #   'PASSWORD': '5499458kK@',
+    #   'HOST': 'mysql',
+    #   'PORT': '3306',
+    #   'OPTIONS': {
+    #       'charset': 'utf8mb4',
+    #   }
+    #}
 }
 
 
