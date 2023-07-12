@@ -9,6 +9,6 @@ class Answer(ExportModelOperationsMixin('answer'),BaseModel):  # Answer 모델
     worry = models.ForeignKey(
         Worry, on_delete=models.CASCADE)  # Worry 모델과 1:1 관계
     content = models.CharField(max_length=300)  # GPT가 답변한 내용
-
+    likes = models.IntegerField(null=True)  # 좋아요 수
     def __str__(self):
         return self.content

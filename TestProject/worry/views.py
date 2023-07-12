@@ -13,17 +13,17 @@ from category.models import Category
 from personality.models import Personality
 from answer.models import Answer
 
-dotenv.load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY")
+dotenv.load_dotenv("/TestProject/.env")
+SECRET_KEY = os.getenv("OPENAI_SECRET_KEY")
 
 
 def gpt_answer(json_data):
     # for OpenAI API calls
     openai.api_key = SECRET_KEY
-    if json_data["sex"] == "male" or json_data["sex"] == "Male":
-        sex = "남자"
+    if json_data["gender"] == "male" or json_data["gender"] == "Male":
+        gender = "남자"
     else:
-        sex = "여자"
+        gender = "여자"
 
     age = json_data["age"]
     job = json_data["job"]
@@ -41,7 +41,7 @@ def gpt_answer(json_data):
     messages = [
         {'role': 'system', 'content': '안녕하세요. 저는 당신의 고민을 들어주는 챗봇입니다.'},
         {'role': 'user', 'content': f"30글자 안으로 {personality}처럼 대답해."},
-        {'role': 'user', "content": f"안녕.{address}에 살고, {job}일을 하는 {age}살 {sex} {name}이야."},
+        {'role': 'user', "content": f"안녕.{address}에 살고, {job}일을 하는 {age}살 {gender} {name}이야."},
         {'role': 'user', 'content': f"{category}에 대한 고민"},
         {'role': 'user', 'content': f"{content}"},
         {'role': 'user', 'content': f"어떻게 해야할까?"}
@@ -67,7 +67,7 @@ def gpt_answer(json_data):
 worry_request_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
-        "sex": openapi.Schema(type=openapi.TYPE_STRING),
+        "gender": openapi.Schema(type=openapi.TYPE_STRING),
         "age": openapi.Schema(type=openapi.TYPE_INTEGER),
         "job": openapi.Schema(type=openapi.TYPE_STRING),
         "nickname": openapi.Schema(type=openapi.TYPE_STRING),
@@ -130,12 +130,12 @@ def get_all_worry(request: Request):
         return Response(content)
     elif request.method == 'POST':
         # user info
-        sex = request.data["sex"]
+        gender = request.data["gender"]
         age = request.data["age"]
         job = request.data["job"]
         nickname = request.data["nickname"]
         address = request.data["address"]
-        if sex == None or age == None or job == None or address == None or nickname == None:
+        if gender == None or age == None or job == None or address == None or nickname == None:
             return Response(status=404, data=f"잘못된 입력입니다.")
         # worry info
         content = request.data['content']
@@ -153,7 +153,7 @@ def get_all_worry(request: Request):
             return Response(status=404, data=f"등록된 인물이 없습니다.")
 
         # user register
-        user_info = User(sex=sex, age=age, job=job,
+        user_info = User(gender=gender, age=age, job=job,
                          nickname=nickname, address=address)
         user_info.save()
 
@@ -163,8 +163,7 @@ def get_all_worry(request: Request):
 
             # personality frequency + 1
             personality_info = Personality.objects.filter(name=personality).first()
-            personality_info.frequency += 1
-            personality_info.save()
+            
         except Exception as e:
             return Response(status=404, data=f"{e}")
 
@@ -173,7 +172,7 @@ def get_all_worry(request: Request):
 
         json_data = {
             "name": nickname,
-            "sex": sex,
+            "gender": gender,
             "age": age,
             "job": job,
             "address": address,
