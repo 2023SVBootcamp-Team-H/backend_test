@@ -61,7 +61,12 @@ def gpt_answer(json_data):
     responded_answer = Answer(worry=worry, content=response['choices'][0]["message"]["content"])
     responded_answer.save()
     print(response['choices'][0]["message"]["content"])
-    return response['choices'][0]["message"]["content"]
+    return {
+        "answer_id": responded_answer.pk,
+        "message": response['choices'][0]["message"]["content"]
+    }
+
+    # return response['choices'][0]["message"]["content"]
 
 
 worry_request_body_schema = openapi.Schema(
@@ -78,6 +83,14 @@ worry_request_body_schema = openapi.Schema(
 
     }
 )
+
+worry_delete_body_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "worry_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+    }
+)
+
 
 
 # query string : /worry/?worry_id=1
@@ -97,6 +110,7 @@ def get_one_worry(request, worry_id):
     except Worry.DoesNotExist:
         return Response(status=404, data=f"{id}번째 고민이 없습니다.")
 
+
 # 특정 id 고민 조회
 
 
@@ -111,7 +125,8 @@ def get_one_worry(request, worry_id):
 )
 @swagger_auto_schema(
     method='delete',
-    operation_description="고민 post.body.id에 해당하는 고민 삭제"
+    request_body=worry_delete_body_schema,
+    operation_description="고민 post.body.worry_id에 해당하는 고민 삭제"
 )
 @swagger_auto_schema(
     method='put',
@@ -119,12 +134,13 @@ def get_one_worry(request, worry_id):
 )
 @api_view(['GET', 'POST', 'DELETE', 'PUT'])
 def get_all_worry(request: Request):
+    print(request.method)
     if request.method == 'GET':
         worries = Worry.objects.all()
         content = []
         for worry in worries:
             content.append({
-                'id': worry.id,
+                'worry_id': worry.id,
                 'content': worry.content,
             })
         return Response(content)
@@ -182,7 +198,7 @@ def get_all_worry(request: Request):
             "worry": worry,
         }
         return Response(status=200, data=gpt_answer(json_data))
-    elif  request.method == 'PUT':
+    elif request.method == 'PUT':
         id = request.data['id']
         content = request.data['content']
         try:
@@ -193,12 +209,11 @@ def get_all_worry(request: Request):
         except Worry.DoesNotExist:
             return Response(status=404, data=f"{id}번째 고민이 없습니다.")
     elif request.method == 'DELETE':
-        id = request.data['id']
+        worry_id = request.data['worry_id']
+        print(worry_id)
         try:
-            worry = Worry.objects.get(id=id)
+            worry = Worry.objects.get(pk=worry_id)
             worry.delete()
-            return Response(status=200, data=f"{id}번째 고민이 삭제되었습니다.")
+            return Response(status=200, data=f"{worry_id}번째 고민이 삭제되었습니다.")
         except Worry.DoesNotExist:
-            return Response(status=404, data=f"{id}번째 고민이 없습니다.")
-
-
+            return Response(status=404, data=f"{worry_id}번째 고민이 없습니다.")
