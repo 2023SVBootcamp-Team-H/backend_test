@@ -139,14 +139,14 @@ def get_one_worry(request, worry_id):
 def get_all_worry(request: Request):
     print(request.method)
     if request.method == 'GET':
+        result = []
         worries = Worry.objects.all()
-        content = []
-        for worry in worries:
-            content.append({
-                'worry_id': worry.id,
-                'content': worry.content,
-            })
-        return Response(content)
+        for w in worries:
+            w_dict = model_to_dict(w)
+            w_dict["answer"] = model_to_dict(w.answer)
+            result.append(w_dict)
+        return Response(result)
+
     elif request.method == 'POST':
         # user info
         gender = request.data["gender"]
