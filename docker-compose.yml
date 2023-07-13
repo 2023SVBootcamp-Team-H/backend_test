@@ -1,0 +1,13 @@
+# Test Version
+version: "3"
+services:
+  web:
+    build: . # build by Dockerfile in current dir.
+    working_dir: /code 
+    command: gunicorn --bind 0:5000 config.wsgi:application
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/code
+    restart: always
+
