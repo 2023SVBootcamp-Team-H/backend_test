@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
 from drf_yasg.utils import swagger_auto_schema
+from django.forms.models import model_to_dict
 from drf_yasg import openapi
 import dotenv
 import openai
@@ -17,7 +18,7 @@ dotenv.load_dotenv("/config/.env")
 SECRET_KEY = os.getenv("OPENAI_SECRET_KEY")
 
 
-def gpt_answer(json_data):
+def gpt_answer(json_data, p: Personality):
     # for OpenAI API calls
     openai.api_key = SECRET_KEY
     if json_data["gender"] == "male" or json_data["gender"] == "Male":
@@ -45,7 +46,9 @@ def gpt_answer(json_data):
         {'role': 'user', 'content': f"{category}에 대한 고민"},
         {'role': 'user', 'content': f"{content}"},
         {'role': 'user', 'content': f"어떻게 해야할까?"}
-    ]   
+    ]
+    # 추후에 몇개를 페이징 할지 정한다.
+    messages.extend(best_worry_answer(p, 5))
     print(messages)
     # send a ChatCompletion request to GPT-3.5-turbo model
     response = openai.ChatCompletion.create(
@@ -165,7 +168,8 @@ def get_all_worry(request: Request):
 
         # personality info
         personality = request.data['personality']
-        if Personality.objects.filter(name=personality).first() is None and len(personality) != 0:
+        p = Personality.objects.filter(name=personality).first()
+        if p is None and len(personality) != 0:
             return Response(status=404, data=f"등록된 인물이 없습니다.")
 
         # user register
@@ -178,8 +182,8 @@ def get_all_worry(request: Request):
             category_info = Category.objects.filter(name=category).first()
 
             # personality frequency + 1
-            personality_info = Personality.objects.filter(name=personality).first()
-            
+            personality_info = p
+
         except Exception as e:
             return Response(status=404, data=f"{e}")
 
@@ -197,7 +201,7 @@ def get_all_worry(request: Request):
             "personality": personality,
             "worry": worry,
         }
-        return Response(status=200, data=gpt_answer(json_data))
+        return Response(status=200, data=gpt_answer(json_data, p))
     elif request.method == 'PUT':
         id = request.data['id']
         content = request.data['content']
@@ -217,3 +221,43 @@ def get_all_worry(request: Request):
             return Response(status=200, data=f"{worry_id}번째 고민이 삭제되었습니다.")
         except Worry.DoesNotExist:
             return Response(status=404, data=f"{worry_id}번째 고민이 없습니다.")
+
+
+def best_worry_answer(p: Personality, page: int):
+    """
+    고민과 답변의 최고 인기있는 리스트를 page수만큼 chatgpt에 넣을수 있게 반환함
+
+    Args:
+        p: 인격 객체
+        page: 페이징할 int, 답변이 2개인데 3개를 페이징 할경우 2개를 반환한다.
+
+    Returns:
+        page수에 맞는 고민, 답 내용을 반환함
+[
+    {
+        "role": "user",
+        "content": "고민내용"
+    },
+
+    {
+        "role": "assistant",
+        "content": "답변내용"
+    }, ...
+]
+    """
+    result = []
+    # 고민중 인격에 맞는 것들중 답변의 좋아요로 내림차순중 최고 좋은 평가를 받은 page만큼 조회
+    worries = Worry.objects.filter(personality=p).order_by('-answer_likes')[:page]
+    for w in worries:
+        # 만약 답변투표를 하지 않은 고민이면 pass 한다.
+        if w.answer.likes is None:
+            continue
+        result.append({
+            "role": "user",
+            "content": w.content
+        })
+        result.append({
+            "role": "assistant",
+            "content": w.answer.content
+        })
+    return result
