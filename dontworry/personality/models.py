@@ -1,5 +1,5 @@
 from django.db import models
-from TestProject.basemodel import BaseModel
+from config.basemodel import BaseModel
 from django_prometheus.models import ExportModelOperationsMixin
 
 class Personality(ExportModelOperationsMixin('personality'),BaseModel):

@@ -1,4 +1,4 @@
-from TestProject.basemodel import BaseModel
+from config.basemodel import BaseModel
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
 
