@@ -113,6 +113,17 @@ def get_one_worry(request, worry_id):
     except Worry.DoesNotExist:
         return Response(status=404, data=f"{id}번째 고민이 없습니다.")
 
+@api_view(['GET'])
+def get_best_worry_answer(request, page):
+    result = []
+    for p in Personality.objects.all():
+        result.append({
+            "personality": model_to_dict(p),
+            f"best_worry_answer_page={page}": best_worry_answer(p, page)
+        })
+
+    return Response(result)
+
 
 # 특정 id 고민 조회
 
