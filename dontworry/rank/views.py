@@ -10,7 +10,7 @@ from user.models import *
 
 
 @swagger_auto_schema(
-    method='delete',
+    method='GET',
     operation_description="인격별 인기도 순위 조회"
 )
 @api_view(['GET'])
@@ -19,7 +19,7 @@ def rank(request: Request):
 
     # 모든 인격 에서
     for p in Personality.objects.all():
-        # worry__personality = p 로 외래키를 2번 건너 필터링 할수있다.
+        # worry__personality = p 로 외래키를 2번 건너 필터링 할수있다.정
         objects_filter = Answer.objects.filter(worry__personality=p)
         # aggregate(avg=Avg('likes'))로 likes의 평균을 반환한다. (null이면 평균계산에 포함하지 않는다.)
         # { "avg" : 평균값 }
@@ -38,7 +38,7 @@ def rank(request: Request):
     return Response({"message": "success", "result": sorted_result})
 
 @swagger_auto_schema(
-    method='delete',
+    method='GET',
     operation_description="인격, 성별 별 인기도 순위 조회"
 )
 @api_view(['GET'])
