@@ -258,9 +258,13 @@ def best_worry_answer(p: Personality, page: int):
     """
     result = []
     # 고민중 인격에 맞는 것들중 답변의 좋아요로 내림차순중 최고 좋은 평가를 받은 page만큼 조회
-    worries = Worry.objects.filter(personality=p).order_by('-answer_likes')[:page]
+    worries = Worry.objects.filter(personality=p).order_by('-answer__likes')[:page]
     for w in worries:
-        # 만약 답변투표를 하지 않은 고민이면 pass 한다.
+        # 만약 답변투표를 하지 않은 고민(방금 생성된 고민)이면 pass 한다.
+        try :
+            w.answer
+        except Exception as e:
+            continue
         if w.answer.likes is None:
             continue
         result.append({
