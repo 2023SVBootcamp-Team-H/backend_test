@@ -10,7 +10,7 @@ from user.models import *
 
 
 @swagger_auto_schema(
-    method='GET',
+    method='get',
     operation_description="인격별 인기도 순위 조회"
 )
 @api_view(['GET'])
@@ -38,7 +38,7 @@ def rank(request: Request):
     return Response({"message": "success", "result": sorted_result})
 
 @swagger_auto_schema(
-    method='GET',
+    method='get',
     operation_description="인격, 성별 별 인기도 순위 조회"
 )
 @api_view(['GET'])
