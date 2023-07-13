@@ -43,12 +43,15 @@ def gpt_answer(json_data, p: Personality):
         {'role': 'system', 'content': '안녕하세요. 저는 당신의 고민을 들어주는 챗봇입니다.'},
         {'role': 'user', 'content': f"30글자 안으로 {personality}처럼 대답해."},
         {'role': 'user', "content": f"안녕.{address}에 살고, {job}일을 하는 {age}살 {gender} {name}이야."},
+    ]
+    messages.extend(best_worry_answer(p, 5))
+    messages.extend([
         {'role': 'user', 'content': f"{category}에 대한 고민"},
         {'role': 'user', 'content': f"{content}"},
         {'role': 'user', 'content': f"어떻게 해야할까?"}
-    ]
+     ])
+
     # 추후에 몇개를 페이징 할지 정한다.
-    messages.extend(best_worry_answer(p, 5))
     print(messages)
     # send a ChatCompletion request to GPT-3.5-turbo model
     response = openai.ChatCompletion.create(
