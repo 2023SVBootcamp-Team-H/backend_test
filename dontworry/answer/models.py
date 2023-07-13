@@ -1,5 +1,5 @@
 from django.db import models
-from TestProject.basemodel import BaseModel
+from config.basemodel import BaseModel
 from worry.models import Worry
 from django_prometheus.models import ExportModelOperationsMixin
 

@@ -1,5 +1,5 @@
 from django.db import models
-from TestProject.basemodel import BaseModel
+from config.basemodel import BaseModel
 from user.models import User
 from category.models import Category
 from personality.models import Personality

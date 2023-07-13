@@ -13,7 +13,7 @@ from category.models import Category
 from personality.models import Personality
 from answer.models import Answer
 
-dotenv.load_dotenv("/TestProject/.env")
+dotenv.load_dotenv("/config/.env")
 SECRET_KEY = os.getenv("OPENAI_SECRET_KEY")
 
 
