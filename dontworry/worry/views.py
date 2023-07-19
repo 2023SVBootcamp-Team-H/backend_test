@@ -1,4 +1,5 @@
 import json
+import time
 
 from django.core.handlers.wsgi import WSGIRequest
 from django.http import StreamingHttpResponse
@@ -291,40 +292,87 @@ def get_all_worry(request: Request):
 
 @csrf_exempt
 def sse_request(request: WSGIRequest):
-    def event_stream(content: str):
+    def error_return(error_message: str):
+        def error_stream():
+            yield f'error_message'
+            time.sleep(0.02)
+            yield f'{error_message}'
+
+
+        return StreamingHttpResponse(
+            error_stream(), content_type='text/event-stream')
+
+    body = json.loads(request.body)
+
+    print(body)
+
+    gender = body["gender"]
+    age = body["age"]
+    job = body["job"]
+    nickname = body["nickname"]
+    address = body["address"]
+    content = body['content']
+    category = body['category']
+    personality = body['personality']
+
+    if gender == None or age == None or job == None or address == None or nickname == None:
+        return error_return("잘못된 입력입니다.")
+    # worry info
+    if content == None or len(content) == 0:
+        return error_return("잘못된 입력입니다.")
+
+    # category info
+    c = Category.objects.filter(name=category).first()
+    if c is None or len(category) == 0:
+        return error_return("등록된 카테고리가 없습니다.")
+
+    # personality info
+    p = Personality.objects.filter(name=personality).first()
+    if p is None and len(personality) != 0:
+        return error_return("등록된 인물이 없습니다.")
+
+    # user register
+    user_info = User(gender=gender, age=age, job=job,
+                     nickname=nickname, address=address)
+    user_info.save()
+
+    # worry register
+    worry = Worry.objects.create(
+        user=user_info, category=c, personality=p, content=content)
+
+    def event_stream():
 
         openai.api_key = SECRET_KEY
-        """
-        # messages = []
+
+        messages = []
         # 좋아던 답변들 5개 등록
-        # messages.extend(best_worry_answer(p, 5))
+        messages.extend(best_worry_answer(p, 5))
         # 고민 넣기
-        # messages.append({'role': 'user', 'content': f"{json_data['content']}"})
-        """
-        messages = [{'role': 'user', 'content': f"{content}"}]
+
+        messages.append({'role': 'user', 'content': f"{body['content']}"})
 
         res = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',
             messages=messages,
             stream=True,  # 추후에 True로 변경 예정
         )
-        # answer = ""
+        answer = ""
 
         # stream의 갯수만큼 보낸다.
         for r in res:
             rs = r["choices"][0]
-            # print(answer)
-            # 만약 끝났다며 stop 문자를 보낸다.
+
             if rs["finish_reason"] == "stop":
-                yield 'stop'
+                break
             else:
                 yield '{}'.format(rs["delta"]["content"])
+                answer += rs["delta"]["content"]
 
-    body = json.loads(request.body)
+        register_answer = Answer(worry=worry, content=answer)
+        register_answer.save()
 
-    print(body)
     response = StreamingHttpResponse(
-        event_stream(body["content"]), content_type='text/event-stream')
+        event_stream(), content_type='text/event-stream')
     response['Cache-Control'] = 'no-cache'  # 캐시를 사용하지 않음
     return response
 
