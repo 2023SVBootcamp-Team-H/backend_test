@@ -13,13 +13,6 @@ score_request_body_schema = openapi.Schema(
         # 필요한 필드들을 추가로 정의합니다.
     }
 )
-score_response_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'message': openapi.Schema(type=openapi.TYPE_STRING),
-        # 필요한 필드들을 추가로 정의합니다.
-    }
-)
 
 init_request_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
@@ -34,10 +27,22 @@ init_response_schema = openapi.Schema(
     }
 )
 
+personalities_get_response_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'personalities_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+        'created_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
+        'updated_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
+        'deleted_at':openapi.Schema(type=openapi.FORMAT_DATETIME, nullable=True),
+        'name': openapi.Schema(type=openapi.TYPE_STRING),
+        'image_url': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+)
 
 @swagger_auto_schema(
     method='get',
     operation_description="인격 전체 조회",
+    responses={200: personalities_get_response_schema}
 )
 @swagger_auto_schema(
     method='post',

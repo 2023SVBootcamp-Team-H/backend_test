@@ -4,7 +4,17 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Answer
 from worry.models import Worry
-
+answer_get_responses_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'answers_id':openapi.Schema(type=openapi.TYPE_INTEGER),
+        'created_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
+        'updated_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
+        'worry_id':openapi.Schema(type=openapi.TYPE_INTEGER),
+        'content':openapi.Schema(type=openapi.TYPE_STRING),
+        'likes':openapi.Schema(type=openapi.TYPE_INTEGER),
+    }
+)
 answer_post_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
@@ -13,13 +23,26 @@ answer_post_body_schema = openapi.Schema(
         # 필요한 필드들을 추가로 정의합니다.
     }
 )
+answer_responses_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'message': openapi.Schema(type=openapi.TYPE_STRING),
+    }
+)
+response_schema_4XX = openapi.Schema(
+    type=openapi.TYPE_STRING,
+    description="4xx 에러입니다."
+)
 @swagger_auto_schema(
     method='get',
     operation_description="답변 전체 조회",
+    responses={200: answer_get_responses_schema}
 )
 @swagger_auto_schema(
     method='post',
     request_body=answer_post_body_schema,
+    responses={200: answer_responses_schema,
+               404: response_schema_4XX},
     operation_description="put.body.answer_id, put.body.likes를 이용해 인기 등록",
 )
 @swagger_auto_schema(

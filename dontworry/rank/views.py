@@ -7,11 +7,63 @@ from rest_framework.response import Response
 from answer.models import *
 from personality.models import *
 from user.models import *
+from drf_yasg import openapi
 
+rank_response_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'message': openapi.Schema(type=openapi.TYPE_STRING),
+        'results': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'personality_name': openapi.Schema(type=openapi.TYPE_STRING),
+                    'image_url': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI),
+                    'avg': openapi.Schema(type=openapi.TYPE_NUMBER),
+                },
+            ),
+        ),
+    },
+)
+gender_response_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
 
+    properties={
+        'message': openapi.Schema(type=openapi.TYPE_STRING),
+        'result': openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'male': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'personality_name': openapi.Schema(type=openapi.TYPE_STRING),
+                            'image_url': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI),
+                            'avg': openapi.Schema(type=openapi.TYPE_NUMBER),
+                        },
+                    ),
+                ),
+                'female': openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            'personality_name': openapi.Schema(type=openapi.TYPE_STRING),
+                            'image_url': openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_URI),
+                            'avg': openapi.Schema(type=openapi.TYPE_NUMBER),
+                        },
+                    ),
+                ),
+            },
+        ),
+    },
+)
 @swagger_auto_schema(
     method='get',
-    operation_description="인격별 인기도 순위 조회"
+    operation_description="인격별 인기도 순위 조회",
+    responses={200: rank_response_schema}
 )
 @api_view(['GET'])
 def rank(request: Request):
@@ -39,7 +91,8 @@ def rank(request: Request):
 
 @swagger_auto_schema(
     method='get',
-    operation_description="인격, 성별 별 인기도 순위 조회"
+    operation_description="인격, 성별 별 인기도 순위 조회",
+    responses={200: gender_response_schema}
 )
 @api_view(['GET'])
 def gender(request: Request):

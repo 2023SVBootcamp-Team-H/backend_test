@@ -89,6 +89,44 @@ worry_request_body_schema = openapi.Schema(
 
     }
 )
+worry_responses_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'answer_id':openapi.Schema(type=openapi.TYPE_INTEGER),
+        'message': openapi.Schema(type=openapi.TYPE_STRING),
+        
+    },
+)
+all_worry_responses_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'worry_id':openapi.Schema(type=openapi.TYPE_INTEGER),
+        'user': openapi.Schema(type=openapi.TYPE_INTEGER),
+        'category': openapi.Schema(type=openapi.TYPE_INTEGER),
+        'personality': openapi.Schema(type=openapi.TYPE_INTEGER),
+        'content': openapi.Schema(type=openapi.TYPE_STRING),
+        'answer': openapi.Schema(
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                 properties={
+                "id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "worry_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+                "content": openapi.Schema(type=openapi.TYPE_STRING),
+                "likes": openapi.Schema(type=openapi.TYPE_INTEGER),
+            }
+            )
+           
+        )
+    }    
+)
+    
+    
+worry_responses_schema_404 = openapi.Schema(
+    type=openapi.TYPE_STRING,
+    description="404 Error입니다."
+)
+
 
 worry_delete_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
@@ -134,10 +172,18 @@ def get_best_worry_answer(request, page):
 @swagger_auto_schema(
     method='get',
     operation_description="고민 전체 조회",
+    responses={
+        200: all_worry_responses_schema,
+    }
+
 )
 @swagger_auto_schema(
     method='post',
     request_body=worry_request_body_schema,
+    responses={
+        200: worry_responses_schema,
+        404: worry_responses_schema_404
+    },
     operation_description="고민 생성",
 )
 @swagger_auto_schema(
@@ -216,6 +262,7 @@ def get_all_worry(request: Request):
             "worry": worry,
         }
         return Response(status=200, data=gpt_answer(json_data, p))
+    
     elif request.method == 'PUT':
         id = request.data['id']
         content = request.data['content']
