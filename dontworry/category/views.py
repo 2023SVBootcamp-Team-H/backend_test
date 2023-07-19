@@ -14,14 +14,29 @@ category_request_body_schema = openapi.Schema(
         "image_url": openapi.Schema(type=openapi.TYPE_STRING),
     }
 )
+category_get_responses_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "category_id": openapi.Schema(type=openapi.TYPE_INTEGER),
+        'created_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
+        'updated_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
+        'deleted_at':openapi.Schema(type=openapi.FORMAT_DATETIME, nullable=True),         
+        "name": openapi.Schema(type=openapi.TYPE_STRING),
+        "image_url": openapi.Schema(type=openapi.TYPE_STRING),
+    }
+)
 
 @swagger_auto_schema(
     method='get',
+    responses={200: category_get_responses_schema},
     operation_description="모든 카테고리 조회")
 @swagger_auto_schema(
     method='post',
     request_body=category_request_body_schema,
-    operation_description="post.body.name, post.body.image_url 을 이용해 카테고리 생성")
+    responses={200: openapi.Response(description='Success')},           
+    operation_description="post.body.name, post.body.image_url 을 이용해 카테고리 생성"
+)
+
 @api_view(['GET', 'POST'])
 def category(request : Request):
     if request.method == 'GET':
