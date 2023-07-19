@@ -1,3 +1,9 @@
+import json
+import time
+
+from django.core.handlers.wsgi import WSGIRequest
+from django.http import StreamingHttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.request import Request
@@ -49,7 +55,7 @@ def gpt_answer(json_data, p: Personality):
         {'role': 'user', 'content': f"{category}에 대한 고민"},
         {'role': 'user', 'content': f"{content}"},
         {'role': 'user', 'content': f"어떻게 해야할까?"}
-     ])
+    ])
 
     # 추후에 몇개를 페이징 할지 정한다.
     print(messages)
@@ -59,11 +65,11 @@ def gpt_answer(json_data, p: Personality):
         messages=messages,
         temperature=0.4,  # 조정 가능한 매개변수. 낮을수록 보수적, 높을수록 다양한 응답
         stream=False,  # 추후에 True로 변경 예정
-        #max_tokens=200,  # 생성할 최대 토큰 수
+        # max_tokens=200,  # 생성할 최대 토큰 수
         n=1,  # 생성할 응답의 수
         # 생성 중지 토큰 (optional)
     )
-    
+
     responded_answer = Answer(worry=worry, content=response['choices'][0]["message"]["content"])
     responded_answer.save()
     print(response['choices'][0]["message"]["content"])
@@ -136,7 +142,6 @@ worry_delete_body_schema = openapi.Schema(
 )
 
 
-
 # query string : /worry/?worry_id=1
 # -> request.GET.get("worry_id") == 1
 
@@ -153,6 +158,7 @@ def get_one_worry(request, worry_id):
         return Response(content)
     except Worry.DoesNotExist:
         return Response(status=404, data=f"{id}번째 고민이 없습니다.")
+
 
 @api_view(['GET'])
 def get_best_worry_answer(request, page):
@@ -284,6 +290,93 @@ def get_all_worry(request: Request):
             return Response(status=404, data=f"{worry_id}번째 고민이 없습니다.")
 
 
+@csrf_exempt
+def sse_request(request: WSGIRequest):
+    def error_return(error_message: str):
+        def error_stream():
+            yield f'error_message'
+            time.sleep(0.02)
+            yield f'{error_message}'
+
+
+        return StreamingHttpResponse(
+            error_stream(), content_type='text/event-stream')
+
+    body = json.loads(request.body)
+
+    print(body)
+
+    gender = body["gender"]
+    age = body["age"]
+    job = body["job"]
+    nickname = body["nickname"]
+    address = body["address"]
+    content = body['content']
+    category = body['category']
+    personality = body['personality']
+
+    if gender == None or age == None or job == None or address == None or nickname == None:
+        return error_return("잘못된 입력입니다.")
+    # worry info
+    if content == None or len(content) == 0:
+        return error_return("잘못된 입력입니다.")
+
+    # category info
+    c = Category.objects.filter(name=category).first()
+    if c is None or len(category) == 0:
+        return error_return("등록된 카테고리가 없습니다.")
+
+    # personality info
+    p = Personality.objects.filter(name=personality).first()
+    if p is None and len(personality) != 0:
+        return error_return("등록된 인물이 없습니다.")
+
+    # user register
+    user_info = User(gender=gender, age=age, job=job,
+                     nickname=nickname, address=address)
+    user_info.save()
+
+    # worry register
+    worry = Worry.objects.create(
+        user=user_info, category=c, personality=p, content=content)
+
+    def event_stream():
+
+        openai.api_key = SECRET_KEY
+
+        messages = []
+        # 좋아던 답변들 5개 등록
+        messages.extend(best_worry_answer(p, 5))
+        # 고민 넣기
+
+        messages.append({'role': 'user', 'content': f"{body['content']}"})
+
+        res = openai.ChatCompletion.create(
+            model='gpt-3.5-turbo',
+            messages=messages,
+            stream=True,  # 추후에 True로 변경 예정
+        )
+        answer = ""
+
+        # stream의 갯수만큼 보낸다.
+        for r in res:
+            rs = r["choices"][0]
+
+            if rs["finish_reason"] == "stop":
+                break
+            else:
+                yield '{}'.format(rs["delta"]["content"])
+                answer += rs["delta"]["content"]
+
+        register_answer = Answer(worry=worry, content=answer)
+        register_answer.save()
+
+    response = StreamingHttpResponse(
+        event_stream(), content_type='text/event-stream')
+    response['Cache-Control'] = 'no-cache'  # 캐시를 사용하지 않음
+    return response
+
+
 def best_worry_answer(p: Personality, page: int):
     """
     고민과 답변의 최고 인기있는 리스트를 page수만큼 chatgpt에 넣을수 있게 반환함
@@ -311,7 +404,7 @@ def best_worry_answer(p: Personality, page: int):
     worries = Worry.objects.filter(personality=p).order_by('-answer__likes')[:page]
     for w in worries:
         # 만약 답변투표를 하지 않은 고민(방금 생성된 고민)이면 pass 한다.
-        try :
+        try:
             w.answer
         except Exception as e:
             continue

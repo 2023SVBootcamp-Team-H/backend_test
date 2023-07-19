@@ -66,7 +66,10 @@ MIDDLEWARE = [
     'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = ("http://*", "https://*")
+# CORS_ORIGIN_WHITELIST = ("http://*", "https://*")
+
+CORS_ORIGIN_ALLOW_ALL = True
+
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'config.urls'
