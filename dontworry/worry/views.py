@@ -322,16 +322,19 @@ def sse_request(request: WSGIRequest):
     # gender info
     if gender == None or age == None or job == None or address == None or nickname == None:
         return error_return("잘못된 입력입니다.")
+    
     # worry info
-    if content == None or len(content) == 0:
+    if content == None:
         return error_return("잘못된 입력입니다.")
+    
     # category info
     c = Category.objects.filter(name=category).first()
-    if c is None or len(category) == 0:
+    if c is None:
         return error_return("등록된 카테고리가 없습니다.")
+    
     # personality info
     p = Personality.objects.filter(name=personality).first()
-    if p is None and len(personality) == 0:
+    if p is None:
         return error_return("등록된 인물이 없습니다.")
 
     
