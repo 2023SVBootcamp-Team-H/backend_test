@@ -6,7 +6,7 @@ from .models import Category
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-# Create your views here.
+
 category_request_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
@@ -17,10 +17,7 @@ category_request_body_schema = openapi.Schema(
 category_get_responses_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
-        "category_id": openapi.Schema(type=openapi.TYPE_INTEGER),
-        'created_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
-        'updated_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
-        'deleted_at':openapi.Schema(type=openapi.FORMAT_DATETIME, nullable=True),         
+        "category_id": openapi.Schema(type=openapi.TYPE_INTEGER),    
         "name": openapi.Schema(type=openapi.TYPE_STRING),
         "image_url": openapi.Schema(type=openapi.TYPE_STRING),
     }
@@ -34,7 +31,7 @@ category_get_responses_schema = openapi.Schema(
     method='post',
     request_body=category_request_body_schema,
     responses={200: openapi.Response(description='Success')},           
-    operation_description="post.body.name, post.body.image_url 을 이용해 카테고리 생성"
+    operation_description= "카테고리의 이름,카테고리의 이미지 url을 이용해 카테고리 생성"
 )
 
 @api_view(['GET', 'POST'])
@@ -46,17 +43,6 @@ def category(request : Request):
         name = request.data.get('name')
         image_url = request.data.get('image_url')
 
-        Category(name=name, image_url=image_url).save()
+        Category.objects.create(name=name, image_url=image_url)
 
         return Response({'success': 'valid data'})
-
-
-
-@api_view(['POST'])
-def create_category(request):
-    name = request.data.get('name')
-    image_url = request.data.get('image_url')
-
-    Category(name=name, image_url=image_url).save()
-
-    return Response({'success': 'valid data'})
