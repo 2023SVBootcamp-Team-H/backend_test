@@ -17,7 +17,7 @@ jobs: # Job
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Set up Python 3.10.0
+      - name: Set up Python 3.11.0
         uses: actions/setup-python@v2
         with:
           python-version: 3.11.0
