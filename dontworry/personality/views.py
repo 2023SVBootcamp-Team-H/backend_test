@@ -4,20 +4,13 @@ from rest_framework.request import Request
 from .models import Personality
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
-score_request_body_schema = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'personality_name': openapi.Schema(type=openapi.TYPE_STRING),
-        'score': openapi.Schema(type=openapi.TYPE_INTEGER),
-        # 필요한 필드들을 추가로 정의합니다.
-    }
-)
-
+import json
 init_request_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
         'personality_name': openapi.Schema(type=openapi.TYPE_STRING),
+        'image_url': openapi.Schema(type=openapi.TYPE_STRING,default="image_url"),
+        'content': openapi.Schema(type=openapi.TYPE_STRING,default="content"),
     }
 )
 init_response_schema = openapi.Schema(
@@ -48,7 +41,7 @@ personalities_get_response_schema = openapi.Schema(
     method='post',
     request_body=init_request_body_schema,
     responses={200: init_response_schema},
-    operation_description="post.body.personality_name에 해당하는 인격 생성"
+    operation_description="해당 이름의 인격 생성, 속성 : 이름, 이미지 url, 초기 내용"
 )
 @swagger_auto_schema(
     method='delete',
@@ -59,16 +52,24 @@ def personalities(request: Request):
     if request.method == 'GET':
         personalities = Personality.objects.values()  # 쿼리셋(QuerySet)을 딕셔너리 형태로 반환
         return Response(personalities)
+    
     elif request.method == 'POST':
         try:
             name = request.data.get("personality_name")
+            image_url = request.data.get("image_url")
+            content = request.data.get("content")
+            
+            content = json.dumps(content).encode('utf-8').decode('unicode_escape')
+            
         except Exception as e:
             return Response({"message": "no attribute personality_name"})
-        Personality(name=name).save()
-
+        
+        Personality.objects.create(name=name, image_url=image_url, content=content)
         return Response({"message": "Personality objects created successfully"})
+    
     elif request.method == 'DELETE':
         p_list = Personality.objects.all()
         for i in p_list:
             i.delete()
         return Response({"message": "Personality objects all Delete"})
+

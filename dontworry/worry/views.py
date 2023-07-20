@@ -292,6 +292,8 @@ def get_all_worry(request: Request):
 
 @csrf_exempt
 def sse_request(request: WSGIRequest):
+    
+    # SSE 방식으로 오류 메시지를 반환
     def error_return(error_message: str):
         def error_stream():
             yield f'error_message'
@@ -302,6 +304,8 @@ def sse_request(request: WSGIRequest):
         return StreamingHttpResponse(
             error_stream(), content_type='text/event-stream')
 
+    # request.body = worry_info
+    # worry = 성별, 나이, 직업, 닉네임, 주소, 고민내용, 카테고리, 인물
     body = json.loads(request.body)
 
     print(body)
@@ -315,40 +319,46 @@ def sse_request(request: WSGIRequest):
     category = body['category']
     personality = body['personality']
 
+    # gender info
     if gender == None or age == None or job == None or address == None or nickname == None:
         return error_return("잘못된 입력입니다.")
+    
     # worry info
-    if content == None or len(content) == 0:
+    if content == None:
         return error_return("잘못된 입력입니다.")
-
+    
     # category info
     c = Category.objects.filter(name=category).first()
-    if c is None or len(category) == 0:
+    if c is None:
         return error_return("등록된 카테고리가 없습니다.")
-
+    
     # personality info
     p = Personality.objects.filter(name=personality).first()
-    if p is None and len(personality) != 0:
+    if p is None:
         return error_return("등록된 인물이 없습니다.")
 
+    
+    
     # user register
-    user_info = User(gender=gender, age=age, job=job,
-                     nickname=nickname, address=address)
-    user_info.save()
+    user_info = User.objects.create(gender=gender, age=age, job=job, nickname=nickname, address=address)
 
     # worry register
-    worry = Worry.objects.create(
-        user=user_info, category=c, personality=p, content=content)
+    worry = Worry.objects.create(user=user_info, category=c, personality=p, content=content)
 
     def event_stream():
 
         openai.api_key = SECRET_KEY
 
         messages = []
-        # 좋아던 답변들 5개 등록
+        
+        # p.content : dump된 json
+        # 고정된 답변
+        messages.extend(json.loads(p.content))
+        
+        # 평점이 좋았던 답변들 5개 등록
         messages.extend(best_worry_answer(p, 5))
+        
         # 고민 넣기
-
         messages.append({'role': 'user', 'content': f"{body['content']}"})
 
         res = openai.ChatCompletion.create(
@@ -371,8 +381,7 @@ def sse_request(request: WSGIRequest):
         register_answer = Answer(worry=worry, content=answer)
         register_answer.save()
 
-    response = StreamingHttpResponse(
-        event_stream(), content_type='text/event-stream')
+    response = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
     response['Cache-Control'] = 'no-cache'  # 캐시를 사용하지 않음
     return response
 
