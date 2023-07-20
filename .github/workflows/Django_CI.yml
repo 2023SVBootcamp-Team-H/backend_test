@@ -1,0 +1,42 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  ci:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10.0
+      
+      - name: Setting .env
+        run: |
+          cd dontworry/config
+          echo OPENAI_SECRET_KEY="${{ secrets.OPENAI_SECRET_KEY }}" >> .env
+          echo DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" >> .env
+          cat .env
+          cd ../..
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Migration
+        run: |
+          cd dontworry/config
+          python manage.py makemigrations
+          python manage.py migrate
+          cd ../..
