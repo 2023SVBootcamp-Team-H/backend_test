@@ -37,6 +37,7 @@ jobs:
       - name: Run Migration
         run: |
           cd dontworry/config
+          ls
           python manage.py makemigrations
           python manage.py migrate
           cd ../..
