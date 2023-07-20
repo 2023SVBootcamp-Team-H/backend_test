@@ -6,7 +6,15 @@ from personality.models import Personality
 from django_prometheus.models import ExportModelOperationsMixin
 
 class Worry(ExportModelOperationsMixin('worry'),BaseModel):  # Worry 모델
-    
+    """
+    Worry 모델
+
+    속성:
+        user: FK,사용자
+        category : FK, 카테고리
+        personality : FK, 인격
+        content : Char, 내용
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE,null=True)
     personality = models.ForeignKey(Personality, on_delete=models.CASCADE,null=True)
