@@ -1,13 +1,17 @@
 # Test Version
-version: "3"
+version: "3.7"
 services:
-  web:
-    build: . # build by Dockerfile in current dir.
-    working_dir: /code 
-    command: gunicorn --bind 0:5000 config.wsgi:application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: sample_jango
+    container_name: api
+    command: >
+      sh -c "python manage.py makemigrations &&
+            python manage.py migrate &&
+            gunicorn --bind 0:5000 config.wsgi:application" 
     ports:
       - "5000:5000"
-    volumes:
-      - ./app:/code
     restart: always
 
