@@ -4,7 +4,7 @@ from rest_framework.request import Request
 from .models import Personality
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+import json
 init_request_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
@@ -52,11 +52,14 @@ def personalities(request: Request):
     if request.method == 'GET':
         personalities = Personality.objects.values()  # 쿼리셋(QuerySet)을 딕셔너리 형태로 반환
         return Response(personalities)
+    
     elif request.method == 'POST':
         try:
             name = request.data.get("personality_name")
             image_url = request.data.get("image_url")
             content = request.data.get("content")
+            
+            content = json.dumps(content).encode('utf-8').decode('unicode_escape')
             
         except Exception as e:
             return Response({"message": "no attribute personality_name"})
