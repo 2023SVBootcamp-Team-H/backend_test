@@ -68,6 +68,7 @@ MIDDLEWARE = [
 
 # CORS_ORIGIN_WHITELIST = ("http://*", "https://*")
 
+# 배포시, 80번 포트만 허용 예정
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
@@ -101,13 +102,16 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db1.sqlite3',
     }
+    # 배포시 AWS RDS로 Migration
+    # Host, User, Password -> Github Secret으로 관리 예정
+    
     # MySQL
     #'default':{
     #   'ENGINE': 'django_prometheus.db.backends.mysql',
     #   'NAME': 'test',
-    #   'USER': 'root',
-    #   'PASSWORD': '5499458kK@',
-    #   'HOST': 'mysql',
+    #   'USER': 'witches',
+    #   'PASSWORD': '5499458kK!',
+    #   'HOST': 'teamh.cq9ddkebs3b1.us-east-1.rds.amazonaws.com',
     #   'PORT': '3306',
     #   'OPTIONS': {
     #       'charset': 'utf8mb4',

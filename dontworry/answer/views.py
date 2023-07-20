@@ -51,7 +51,15 @@ response_schema_4XX = openapi.Schema(
 )
 @api_view(['GET', 'POST', 'DELETE'])
 def answer_get_score(request):
-    # 모든 답변 조회
+    """
+        GET : 답변 전체 조회
+        
+        POST : 답변 인기도 투표
+        
+        DELETE : 답변 삭제
+    """
+    
+    # 전체 답변 조회
     if request.method == 'GET':
         answers = Answer.objects.values()
         return Response(status=200, data=answers)

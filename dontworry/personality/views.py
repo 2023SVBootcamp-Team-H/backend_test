@@ -9,8 +9,8 @@ init_request_body_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
         'personality_name': openapi.Schema(type=openapi.TYPE_STRING),
-        'image_url': openapi.Schema(type=openapi.TYPE_STRING,default="image_url"),
-        'content': openapi.Schema(type=openapi.TYPE_STRING,default="content"),
+        'image_url': openapi.Schema(type=openapi.TYPE_STRING, default="image_url"),
+        'content': openapi.Schema(type=openapi.TYPE_STRING, default="content"),
     }
 )
 init_response_schema = openapi.Schema(
@@ -24,13 +24,11 @@ personalities_get_response_schema = openapi.Schema(
     type=openapi.TYPE_OBJECT,
     properties={
         'personalities_id': openapi.Schema(type=openapi.TYPE_INTEGER),
-        'created_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
-        'updated_at':openapi.Schema(type=openapi.FORMAT_DATETIME),
-        'deleted_at':openapi.Schema(type=openapi.FORMAT_DATETIME, nullable=True),
         'name': openapi.Schema(type=openapi.TYPE_STRING),
         'image_url': openapi.Schema(type=openapi.TYPE_STRING),
     }
 )
+
 
 @swagger_auto_schema(
     method='get',
@@ -52,24 +50,25 @@ def personalities(request: Request):
     if request.method == 'GET':
         personalities = Personality.objects.values()  # 쿼리셋(QuerySet)을 딕셔너리 형태로 반환
         return Response(personalities)
-    
+
     elif request.method == 'POST':
         try:
             name = request.data.get("personality_name")
             image_url = request.data.get("image_url")
             content = request.data.get("content")
-            
-            content = json.dumps(content).encode('utf-8').decode('unicode_escape')
-            
+
+            content = json.dumps(content).encode(
+                'utf-8').decode('unicode_escape')
+
         except Exception as e:
             return Response({"message": "no attribute personality_name"})
-        
-        Personality.objects.create(name=name, image_url=image_url, content=content)
+
+        Personality.objects.create(
+            name=name, image_url=image_url, content=content)
         return Response({"message": "Personality objects created successfully"})
-    
+
     elif request.method == 'DELETE':
         p_list = Personality.objects.all()
         for i in p_list:
             i.delete()
         return Response({"message": "Personality objects all Delete"})
-
