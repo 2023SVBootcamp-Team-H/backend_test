@@ -7,15 +7,20 @@ on:
     branches: [ "master" ]
 
 jobs:
-  CI:
+  CI_CD:
     runs-on: ubuntu-latest
     steps:
+      # 깃허브 레포지토리에서 코드를 가져옴
       - name: Checkout
         uses: actions/checkout@v2
+      
+      # 파이썬 버전 설정
       - name: Set up Python 3.11.0
         uses: actions/setup-python@v2
         with:
           python-version: 3.11.0
+
+      # .env 파일 생성
       - name: Setting .env
         run: |
           cd dontworry/config
@@ -23,28 +28,25 @@ jobs:
           echo DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" >> .env
           cat .env
           cd ../..
+
+      # 디펜던시 설치
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      # 장고 마이그레이션
       - name: Run Migration
         run: |
           cd dontworry
           python manage.py makemigrations
           python manage.py migrate
           cd ..
-
-  CD:
-    runs-on: ubuntu-latest
-    needs: CI
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        
-      - name: Set up Python 3.11.0
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.11.0
+      
+      # Docker Hub에 push할 이미지 빌드
+      - name: Docker Build
+        run: |
+          docker build -t ghkd110/api:latest .
 
       # 도커 허브 사용을 위해 도커에 로그인
       - name: Login to DockerHub
@@ -52,24 +54,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }} # 도커 홈페이지에서 발급받은 토큰 사용
-
-      # 이미지 빌드를 위해 .env 생성
-      - name: Setting .env
+      
+      - name: Push to DockerHub
         run: |
-          cd dontworry/config
-          echo "${{ secrets.DJANGO_SECRET_KEY }}" >> .env 
-          echo "${{ secrets.OPENAI_SECRET_KEY }}" >> .env
-          cat .env
-
-      # docker-compose에서 사용하는 이미지들을 build, 공식 이미지들은 x
-      - name: Build docker images
-        run: |
-          docker-compose build api # 서비스 이름에 맞게 수정
-          docker images
-
-      # docker hub repository에 이미지들을 push
-      - name: Push docker images
-        run: docker-compose push api # 서비스 이름에 맞게 수정
+          docker push ghkd110/api:latest
 
       # ssh를 통해 EC2에 접속, 접속한 후에 실행할 스크립트 작성
       - name: Connect to EC2 using SSH
