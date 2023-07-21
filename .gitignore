@@ -8,6 +8,8 @@ django/
 migrations/
 # C extensions
 *.so
+node_modules/
+package-lock.json
 
 # Distribution / packaging
 .Python
