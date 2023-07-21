@@ -42,6 +42,11 @@ jobs:
           python manage.py makemigrations
           python manage.py migrate
           cd ..
+      
+      # Docker Hub에 push할 이미지 빌드
+      - name: Docker Build
+        run: |
+          docker build -t ghkd110/api:latest .
 
       # 도커 허브 사용을 위해 도커에 로그인
       - name: Login to DockerHub
@@ -49,6 +54,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }} # 도커 홈페이지에서 발급받은 토큰 사용
+      
+      - name: Push to DockerHub
+        run: |
+          docker push ghkd110/api:latest
 
       # ssh를 통해 EC2에 접속, 접속한 후에 실행할 스크립트 작성
       - name: Connect to EC2 using SSH
@@ -63,25 +72,3 @@ jobs:
             sudo docker-compose down 
             sudo docker-compose pull 
             sudo docker-compose up -d
-
-
-      - name: Checkout
-        uses: actions/checkout@v2
-        
-      - name: Set up Python 3.11.0
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.11.0
-
-      
-
-
-      # docker-compose에서 사용하는 이미지들을 build, 공식 이미지들은 x
-      - name: Build docker images
-        run: |
-          docker-compose build api # 서비스 이름에 맞게 수정
-          docker images
-
-      # docker hub repository에 이미지들을 push
-      - name: Push docker images
-        run: docker-compose push api # 서비스 이름에 맞게 수정
