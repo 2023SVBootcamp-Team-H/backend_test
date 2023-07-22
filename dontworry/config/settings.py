@@ -104,11 +104,11 @@ DATABASES = {
     # AWS RDS
     'default':{
         'ENGINE': 'django_prometheus.db.backends.mysql',
-        'NAME': 'project',
-        'USER': 'witches',
-        'PASSWORD': '5499458kK!',
-        'HOST': 'teamh.cq9ddkebs3b1.us-east-1.rds.amazonaws.com',
-        'PORT': '3306',
+        'NAME': 'project', # DB명 '${{ secrets.RDS_DB }}}'
+        'USER': 'witches', # DB계정 '${{ secrets.RDS_USER }}'
+        'PASSWORD': '5499458kK!', # DB계정 비밀번호 '${{ secrets.RDS_PASSWORD }}'
+        'HOST': 'teamh.cq9ddkebs3b1.us-east-1.rds.amazonaws.com', # RDS 엔드포인트 '${{ secrets.RDS_HOST }}}'
+        'PORT': '3306', # RDS 포트 '${{ secrets.RDS_PORT }}'
         'OPTIONS': {
             'charset': 'utf8mb4',
         }

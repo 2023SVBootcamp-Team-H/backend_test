@@ -2,15 +2,14 @@
 version: "3.7"
 services:
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghkd110/api:latest
     # image: sample_jango
     container_name: api
-    command: >
-      sh -c "python manage.py makemigrations &&
-            python manage.py migrate &&
-            gunicorn --bind 0:5000 config.wsgi:application" 
+    command: "gunicorn --bind 0:5000 config.wsgi:application"
+    # command: >
+    #   sh -c "python manage.py makemigrations &&
+    #         python manage.py migrate &&
+    #         gunicorn --bind 0:5000 config.wsgi:application" 
     ports:
       - "5000:5000"
     restart: always
