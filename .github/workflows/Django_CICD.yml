@@ -1,8 +1,6 @@
 name: DJANGO CI CD
 
 on:
-  push:
-    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
@@ -21,12 +19,16 @@ jobs:
           python-version: 3.11.0
 
       # .env 파일 생성
+      # 배포시 주석 해제 예정
+      
       - name: Setting .env
         run: |
           cd dontworry/config
           echo OPENAI_SECRET_KEY="${{ secrets.OPENAI_SECRET_KEY }}" >> .env
           echo DJANGO_SECRET_KEY="${{ secrets.DJANGO_SECRET_KEY }}" >> .env
-          cat .env
+          echo AWS_HOST="${{ secrets.AWS_HOST }}" >> .env
+          echo AWS_USERNAME="${{ secrets.AWS_USERNAME }}" >> .env
+          echo AWS_KEY_PEM="${{ secrets.AWS_KEY_PEM }}" >> .env
           cd ../..
 
       # 디펜던시 설치
@@ -46,7 +48,7 @@ jobs:
       # Docker Hub에 push할 이미지 빌드
       - name: Docker Build
         run: |
-          docker build -t ghkd110/api:latest .
+          docker build -t ${{secrets.DOCKER_IMAGE}} .
 
       # 도커 허브 사용을 위해 도커에 로그인
       - name: Login to DockerHub
@@ -57,7 +59,7 @@ jobs:
       
       - name: Push to DockerHub
         run: |
-          docker push ghkd110/api:latest
+          docker push ${{secrets.DOCKER_IMAGE}}
 
       # ssh를 통해 EC2에 접속, 접속한 후에 실행할 스크립트 작성
       - name: Connect to EC2 using SSH
@@ -68,7 +70,6 @@ jobs:
           key: ${{ secrets.AWS_KEY_PEM }}
           envs: GITHUB_SHA
           script: |
-            git pull 
             sudo docker-compose down 
             sudo docker-compose pull 
             sudo docker-compose up -d
