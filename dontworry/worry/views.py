@@ -17,7 +17,7 @@ import os
 from .models import Worry
 from user.models import User
 from category.models import Category
-from personality.models import Personality
+from personality.models import *
 from answer.models import Answer
 
 dotenv.load_dotenv("/config/.env")
@@ -359,11 +359,17 @@ def sse_request(request: WSGIRequest):
         messages.extend(best_worry_answer(p, 5))
         
         # 고민 넣기
-        messages.append({'role': 'user', 'content': f"{body['content']}"})
+        messages.append({'role': 'user', 'content': f"\"{body['content']}\"{p.static_personality.prompt}"})
 
         res = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',
             messages=messages,
+            temperature=p.static_personality.temperature,
+            max_tokens=p.static_personality.max_tokens,
+            top_p=p.static_personality.top_p,
+            frequency_penalty=p.static_personality.frequency_penalty,
+            presence_penalty=p.static_personality.presence_penalty,
+            stop=p.static_personality.stop,
             stream=True,  # 추후에 True로 변경 예정
         )
         answer = ""
