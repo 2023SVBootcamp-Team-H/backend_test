@@ -3,13 +3,13 @@ import json
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.test import APITestCase, APIRequestFactory
-from django.forms.models import model_to_dict
-from personality.models import Personality
+
 from answer.models import Answer
-from worry.models import Worry
-from category.models import Category
-from rank.views import rank, gender
 from answer.views import answer_get_score
+from category.models import Category
+from personality.models import Personality
+from rank.views import rank
+from worry.models import Worry
 
 content = [
     {"role": "system", "content": '너는 진지한 조수입니다.'},

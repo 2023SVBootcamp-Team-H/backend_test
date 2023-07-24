@@ -1,13 +1,8 @@
 import json
 
-import requests
-from django.urls import reverse
 from django.test import TestCase
-from django.core.handlers.wsgi import WSGIRequest
-from personality.models import Personality, Static_Personality
-from rest_framework.test import APIRequestFactory
 
-from personality.views import personalities
+from personality.models import Personality, Static_Personality
 
 content = [
     {"role": "system", "content": '너는 진지한 조수입니다.'},
