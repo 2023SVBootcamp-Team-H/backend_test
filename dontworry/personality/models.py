@@ -16,3 +16,17 @@ class Personality(ExportModelOperationsMixin('personality'),BaseModel):
     content = models.TextField(null=True)
     def __str__(self):
         return self.name
+
+    
+class Static_Personality(models.Model):
+    personality = models.OneToOneField(Personality, on_delete=models.CASCADE)
+    temperature= models.FloatField(null=True)
+    max_tokens= models.IntegerField(null=True)
+    top_p= models.FloatField(null=True)
+    frequency_penalty= models.FloatField(null=True)
+    presence_penalty= models.FloatField(null=True)
+    stop= models.CharField(max_length=50, null=True)
+    prompt = models.CharField(max_length=200, null=True)
+    def __str__(self):
+        return self.peronality.name+'static'
+    
