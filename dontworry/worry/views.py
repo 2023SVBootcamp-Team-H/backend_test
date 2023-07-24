@@ -100,7 +100,7 @@ worry_responses_schema = openapi.Schema(
     properties={
         'answer_id':openapi.Schema(type=openapi.TYPE_INTEGER),
         'message': openapi.Schema(type=openapi.TYPE_STRING),
-        
+
     },
 )
 all_worry_responses_schema = openapi.Schema(
@@ -122,12 +122,12 @@ all_worry_responses_schema = openapi.Schema(
                 "likes": openapi.Schema(type=openapi.TYPE_INTEGER),
             }
             )
-           
+
         )
-    }    
+    }
 )
-    
-    
+
+
 worry_responses_schema_404 = openapi.Schema(
     type=openapi.TYPE_STRING,
     description="404 Error입니다."
@@ -268,7 +268,7 @@ def get_all_worry(request: Request):
             "worry": worry,
         }
         return Response(status=200, data=gpt_answer(json_data, p))
-    
+
     elif request.method == 'PUT':
         id = request.data['id']
         content = request.data['content']
@@ -292,7 +292,7 @@ def get_all_worry(request: Request):
 
 @csrf_exempt
 def sse_request(request: WSGIRequest):
-    
+
     # SSE 방식으로 오류 메시지를 반환
     def error_return(error_message: str):
         def error_stream():
@@ -322,23 +322,23 @@ def sse_request(request: WSGIRequest):
     # gender info
     if gender == None or age == None or job == None or address == None or nickname == None:
         return error_return("잘못된 입력입니다.")
-    
+
     # worry info
     if content == None:
         return error_return("잘못된 입력입니다.")
-    
+
     # category info
     c = Category.objects.filter(name=category).first()
     if c is None:
         return error_return("등록된 카테고리가 없습니다.")
-    
+
     # personality info
     p = Personality.objects.filter(name=personality).first()
     if p is None:
         return error_return("등록된 인물이 없습니다.")
 
-    
-    
+
+
     # user register
     user_info = User.objects.create(gender=gender, age=age, job=job, nickname=nickname, address=address)
 
@@ -350,14 +350,14 @@ def sse_request(request: WSGIRequest):
         openai.api_key = SECRET_KEY
 
         messages = []
-        
+
         # p.content : dump된 json
         # 고정된 답변
         messages.extend(json.loads(p.content))
-        
+
         # 평점이 좋았던 답변들 5개 등록
         messages.extend(best_worry_answer(p, 5))
-        
+
         # 고민 넣기
        #messages.append({'role': 'user', 'content': f"\"{body['content']}\"{p.static_personality.prompt}"})
         prompt = p.static_personality.prompt.replace("{content}", content)
@@ -380,6 +380,7 @@ def sse_request(request: WSGIRequest):
             rs = r["choices"][0]
 
             if rs["finish_reason"] == "stop":
+                yield '{}'.format("stop")
                 break
             else:
                 yield '{}'.format(rs["delta"]["content"])
@@ -387,6 +388,8 @@ def sse_request(request: WSGIRequest):
 
         register_answer = Answer(worry=worry, content=answer)
         register_answer.save()
+
+        yield '{}'.format(register_answer.id)
 
     response = StreamingHttpResponse(event_stream(), content_type='text/event-stream')
     response['Cache-Control'] = 'no-cache'  # 캐시를 사용하지 않음

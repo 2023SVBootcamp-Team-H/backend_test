@@ -28,5 +28,5 @@ class Static_Personality(models.Model):
     stop= models.CharField(max_length=50, null=True)
     prompt = models.CharField(max_length=200, null=True)
     def __str__(self):
-        return self.peronality.name+'static'
+        return self.personality.name+'static'
     
