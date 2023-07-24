@@ -59,7 +59,7 @@ class TestModel(TestCase):
     def setUpTestData(cls):
         print("setUpTestData: Run once to set up non-modified data for all class methods.")
         p = Personality.objects.create(name='할머니', image_url='test', content=json.dumps(content, ensure_ascii=False))
-        sp = Static_Personality.objects.create(peronality=p, temperature=0.7, max_tokens=70, top_p=1,
+        sp = Static_Personality.objects.create(personality=p, temperature=0.7, max_tokens=70, top_p=1,
                                                frequency_penalty=0, presence_penalty=0, prompt='라는 고민을 50글자 이내로 대답해줘')
 
     pass
@@ -71,7 +71,7 @@ class TestModel(TestCase):
     def test_sp_equals_p_static_personality(self):
         print("Method: sp_is_p_static_personality")
         p = Personality.objects.get(name='할머니')
-        sp = Static_Personality.objects.get(peronality=p)
+        sp = Static_Personality.objects.get(personality=p)
         self.assertEqual(p.static_personality, sp)
 
     def test_p_content_json_loads_equals_content(self):
