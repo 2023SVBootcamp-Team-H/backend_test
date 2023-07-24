@@ -359,8 +359,9 @@ def sse_request(request: WSGIRequest):
         messages.extend(best_worry_answer(p, 5))
         
         # 고민 넣기
-        messages.append({'role': 'user', 'content': f"\"{body['content']}\"{p.static_personality.prompt}"})
-
+       #messages.append({'role': 'user', 'content': f"\"{body['content']}\"{p.static_personality.prompt}"})
+        prompt = p.static_personality.prompt.replace("{content}", content)
+        messages.append({'role': 'user', 'content': prompt})
         res = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',
             messages=messages,
