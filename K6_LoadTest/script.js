@@ -76,14 +76,14 @@ export function getWorryFunc() {
     runScenario('/worry/1', 'GET', trends.getWorry);
 }
 
-export function deleteAnswerFunc() {
-    runScenario('/answer/1', 'DELETE', trends.deleteAnswer);
-}
+// export function deleteAnswerFunc() {
+//     runScenario('/answer/1', 'DELETE', trends.deleteAnswer);
+// }
 
 export function getTestWorryFunc() {
     runScenario('/worry/test/1', 'GET', trends.getTestWorry);
 }
 
-export function putWorryFunc() {
-    runScenario('/worry/', 'PUT', trends.putWorry, PAYLOAD, JSON_HEADER);
-}
+// export function putWorryFunc() {
+//     runScenario('/worry/', 'PUT', trends.putWorry, PAYLOAD, JSON_HEADER);
+// }
