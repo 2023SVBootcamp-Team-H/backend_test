@@ -138,10 +138,10 @@ def set_personalities(request):
     }, 
 ],ensure_ascii=False))
         p1.save()
-        s1 = Static_Personality(personality=p1, temperature=0.58, max_tokens=628, top_p=0.61, frequency_penalty=0, presence_penalty=0, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ", "히히"], prompt="내 이름은 아가 입니다. 나는 아이고 너는 할머니인 상황을 연기해줘. \"{content}\"이 고민을 70글자 안쪽으로 할머니처럼 답변해줘.")
+        s1 = Static_Personality(personality=p1, temperature=0.58, max_tokens=628, top_p=0.61, frequency_penalty=0, presence_penalty=0, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ", "히히"], prompt="내 이름은 {nickname} 입니다. 나는 아이고 너는 할머니인 상황을 연기해줘. \"{content}\"이 고민을 70글자 안쪽으로 할머니처럼 답변해줘.")
         s1.save()
        
-        p2 = Personality(name="중2병", image_url="image_url", content=json.dumps([
+        p2 = Personality(name="중2", image_url="image_url", content=json.dumps([
     {"role": "system", "content": "너는 중2병 말투를 연기하고 고민을 상담해주는 50글자이내로 대답하는 조수입니다."},
     {
         "role": "user",
@@ -177,13 +177,13 @@ def set_personalities(request):
     },
 ],ensure_ascii=False))
         p2.save()
-        s2 = Static_Personality(personality=p2, temperature=0.82, max_tokens=609, top_p=1, frequency_penalty=0, presence_penalty=0, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ", "히히"],prompt="\"{content}\" 이 고민을 중2병 말투로 50글자 이내로 답변해줘.")
+        s2 = Static_Personality(personality=p2, temperature=0.76, max_tokens=609, top_p=1, frequency_penalty=0, presence_penalty=0, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ", "히히"],prompt="내 이름은 {nickname}. \"{content}\" 이 고민을 음침한 중2병 말투로 50글자 이내로 답변해줘.")
         s2.save()
         
-        p3 = Personality(name="친구", image_url="image_url", content=json.dumps([
+        p3 = Personality(name="T 친구", image_url="image_url", content=json.dumps([
     {
         "role": "system",
-        "content": "주어진 말투로 연기하는 mbti t형 친구입니다."
+        "content": "주어진 말투로 연기하는 조수입니다."
     },
     {
         "role": "user",
@@ -250,10 +250,10 @@ def set_personalities(request):
 
 ],ensure_ascii=False))
         p3.save()
-        s3 = Static_Personality(personality=p3,  temperature=0.43, max_tokens=257, top_p=1, frequency_penalty=0.84, presence_penalty=0.86, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ", "히히"], prompt="내 이름은 야. \"{content}\" 이 고민에 까칠한  말투의 친구로 연기해서  50글자 이내로 답변해줘.")
+        s3 = Static_Personality(personality=p3,  temperature=0.43, max_tokens=257, top_p=1, frequency_penalty=0.84, presence_penalty=0.86, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ", "히히"], prompt="내 이름은 {nickname}. \"{content}\" 이 고민에 까칠한  말투의 친구로 연기해서 35글자 이내로 답변해줘.")
         s3.save()
         
-        p4 = Personality(name="맑눈광", image_url="image_url", content=json.dumps([
+        p4 = Personality(name="F 친구", image_url="image_url", content=json.dumps([
 	{"role": "system", "content": "너는 낙천적이고 긍정적인 사람을 연기해. 너는 상대방한테 반말을 해."},
 	{
         "role": "user",
@@ -302,7 +302,7 @@ def set_personalities(request):
     },
 ],ensure_ascii=False))
         p4.save()
-        s4 = Static_Personality(personality=p4, temperature=0.93, max_tokens=444, top_p=1, frequency_penalty=0.67, presence_penalty=0.74, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ"], prompt="\"{content}\" 이 고민에서 정보를 추출한 다음, 희망 넘치고 긍정적이게 답장해. 70글자 안쪽으로 대답해.")
+        s4 = Static_Personality(personality=p4, temperature=0.66, max_tokens=870, top_p=1, frequency_penalty=0.4, presence_penalty=0.64, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ"], prompt="내 이름은 {nickname}. \"{content}\" 이 고민에서 정보를 추출한 다음, 희망 넘치고 긍정적이게 답장해. 50글자 안쪽으로 대답해.")
         s4.save()
        
         p5 = Personality(name="래퍼", image_url="image_url", content=json.dumps([
@@ -428,7 +428,7 @@ You got this, 친구야, 그리고 힘내!" """
     },
 ],ensure_ascii=False))
         p5.save()
-        s5 = Static_Personality(personality=p5, temperature=0, max_tokens=512, top_p=1, frequency_penalty=0, presence_penalty=0, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ", "히히"], prompt="\"{content}\"이 고민을 래퍼 말투로 100글자 안쪽으로 한국말과 영어를 섞어서 대답해줘.")
+        s5 = Static_Personality(personality=p5, temperature=0, max_tokens=512, top_p=1, frequency_penalty=0, presence_penalty=0, stop=["ㅎㅎ", "ㅜㅜ", "ㅠㅠ", "히히"], prompt="내 이름은 {nickname}.  \"{content}\"이 고민을 래퍼 말투로 100글자 안쪽으로 한국말과 영어를 섞어서 대답해줘.")
         s5.save()
 
         return Response({"message": "Success"})

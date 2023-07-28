@@ -209,7 +209,10 @@ def get_all_worry(request: Request):
         worries = Worry.objects.all()
         for w in worries:
             w_dict = model_to_dict(w)
-            w_dict["answer"] = model_to_dict(w.answer)
+            try:
+                w_dict["answer"] = model_to_dict(w.answer)
+            except:
+                w_dict["answer"] = {}
             result.append(w_dict)
         return Response(result)
 
@@ -360,7 +363,7 @@ def sse_request(request: WSGIRequest):
 
         # 고민 넣기
        #messages.append({'role': 'user', 'content': f"\"{body['content']}\"{p.static_personality.prompt}"})
-        prompt = p.static_personality.prompt.replace("{content}", content)
+        prompt = p.static_personality.prompt.replace("{nickname}", nickname)("{content}",content)
         messages.append({'role': 'user', 'content': prompt})
         res = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',

@@ -64,7 +64,7 @@ def set_category(request):
 
         c1=Category(name="학업",image_url="image_url").save()
         c2=Category(name="건강", image_url="image_url").save()
-        c3=Category(name="돈/경제", image_url="image_url").save()
+        c3=Category(name="경제", image_url="image_url").save()
         c4=Category(name="가족관계", image_url="image_url").save()
         c5=Category(name="결혼", image_url="image_url").save()
         c6=Category(name="미래", image_url="image_url").save()
